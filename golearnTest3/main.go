@@ -1,4 +1,4 @@
-package golearntest3
+package main
 
 import "fmt"
 
@@ -12,5 +12,12 @@ func main() {
 
 func isValid(test string) {
 	fmt.Println("test is ", test)
+	// llen :=len(test)
+	var code []string = []string{}
+	for i, v := range test {
+		code[i] = v
+		if len(code) > 1 {
 
+		}
+	}
 }

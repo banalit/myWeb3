@@ -17,8 +17,9 @@ func doCheck(test int) bool {
 		return true
 	}
 	str := strconv.Itoa(test)
-	bytes := []byte(str)
-	fmt.Println("test is ", test)
+	// bytes := []byte(str)
+	bytes := str
+	// fmt.Println("test is ", test)
 	for i := 0; i < len(bytes)/2; i++ {
 		b := bytes[i]
 		e := bytes[len(bytes)-1-i]
@@ -34,14 +35,14 @@ func isPalindrome(test int) bool {
 	if check {
 		fmt.Println(test, " is 回文数")
 	} else {
-		fmt.Println(test, " is not 回文数")
+		fmt.Println(test, " not 回文数")
 	}
 	return check
 }
 
 func main() {
-	x := 123321
-	y := 123123
-	isPalindrome(x)
-	isPalindrome(y)
+	isPalindrome(123321)
+	isPalindrome(123123)
+	isPalindrome(123123999)
+	isPalindrome(-123321)
 }
