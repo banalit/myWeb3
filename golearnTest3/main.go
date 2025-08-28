@@ -6,11 +6,11 @@ import "fmt"
 func main() {
 	var test = "()[]{}"
 	var test2 = "{(})"
-	valid(test)
-	valid(test2)
+	isValid(test)
+	isValid(test2)
 }
 
-func valid(test string) {
+func isValid(test string) {
 	fmt.Println("test is ", test)
 
 }
