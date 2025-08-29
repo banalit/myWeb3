@@ -15,6 +15,14 @@
             ],
             "env": {},
             "showLog": false
+        },
+        {
+        "name": "Run Current File",
+        "type": "go",
+        "request": "launch",
+        //   "goproxy": "https://goproxy.cn,direct",
+        "mode": "auto", // 自动判断是运行还是调试
+        "program": "${file}" // 指向当前打开的文件
         }
     ]
 }
