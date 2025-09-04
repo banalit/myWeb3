@@ -20,7 +20,8 @@ type Transaction struct {
 	Amount        int64
 }
 
-func TransactionTest(db *gorm.DB) {
+func TransactionTest() {
+	db := getGormDb()
 	db.AutoMigrate(&Account{})
 	db.AutoMigrate(&Transaction{})
 	account1 := Account{

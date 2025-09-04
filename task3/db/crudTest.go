@@ -3,8 +3,6 @@ package task3
 import (
 	"fmt"
 	"time"
-
-	"gorm.io/gorm"
 )
 
 type Student struct {
@@ -16,7 +14,8 @@ type Student struct {
 	UpdateAt time.Time
 }
 
-func CrudTest(db *gorm.DB) {
+func CrudTest() {
+	db := getGormDb()
 	student := &Student{
 		Name:  "zhangsan",
 		Age:   20,
