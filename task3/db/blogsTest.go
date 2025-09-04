@@ -50,28 +50,26 @@ func BlogTest() {
 	db := getGormDb()
 	c := &Comment{}
 	db.First(c, 4)
-	fmt.Println("comment:", c)
-
-	err := db.Unscoped().Debug().Delete(&Comment{}, 7).Error
+	err := db.Unscoped().Debug().Delete(c).Error
 	fmt.Println("err:", err)
 
-	// fmt.Println("save post")
-	// var p = Post{Title: "title1", Content: "abc", UserID: 3}
-	// db.Create(&p)
+	fmt.Println("save post")
+	var p = Post{Title: "title1", Content: "abc", UserID: 3}
+	db.Create(&p)
 
-	// var user = User{Name: "peter"}
-	// result := db.Preload("Posts").Preload("Comments").Preload("Comments.Post").First(&user)
-	// if result.Error != nil {
-	// 	fmt.Println("blog test error:", result.Error)
-	// 	return
-	// }
-	// fmt.Println("blog user:", user.ID, user.Name, user.PostCount)
-	// for _, post := range user.Posts {
-	// 	fmt.Println("post:", post.Title, post.Content)
-	// }
-	// for _, comment := range user.Comments {
-	// 	fmt.Println("comment:", comment.Content, comment.Post.Title)
-	// }
+	var user = User{Name: "peter"}
+	result := db.Preload("Posts").Preload("Comments").Preload("Comments.Post").First(&user)
+	if result.Error != nil {
+		fmt.Println("blog test error:", result.Error)
+		return
+	}
+	fmt.Println("blog user:", user.ID, user.Name, user.PostCount)
+	for _, post := range user.Posts {
+		fmt.Println("post:", post.Title, post.Content)
+	}
+	for _, comment := range user.Comments {
+		fmt.Println("comment:", comment.Content, comment.Post.Title)
+	}
 
 }
 
@@ -117,8 +115,11 @@ func (c *Comment) AfterCreate(tx *gorm.DB) (err error) {
 	return err
 }
 
-func (c *Comment) AfterDelete(tx *gorm.DB) (err error) {
-	fmt.Println("after delete comment:", c)
+func (c *Comment) BeforeDelete(tx *gorm.DB) (err error) {
+	fmt.Println("BeforeDelete comment:", c)
+	if c.ID == 0 {
+		return
+	}
 	err = tx.First(&Post{}, c.PostID).Updates(map[string]interface{}{
 		"comment_count":  gorm.Expr("comment_count-1"),
 		"comment_status": gorm.Expr("case when comment_count=0 then 'no comment' else 'have comment' end"),
