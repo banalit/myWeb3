@@ -3,7 +3,7 @@ package task3
 import "fmt"
 
 type Employee struct {
-	ID         uint64 `gorm:primarykey`
+	ID         uint64 `gorm:"primaeryKey"`
 	Name       string
 	Department string
 	Salary     uint64

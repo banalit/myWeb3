@@ -7,6 +7,8 @@ import (
 func main() {
 	// task3.CrudTest()
 	// task3.TransactionTest()
-	task3.SqlxTest()
+	// task3.SqlxTest()
+	// task3.PrepareBlogData()
+	task3.BlogTest()
 
 }
