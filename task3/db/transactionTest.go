@@ -21,7 +21,7 @@ type Transaction struct {
 }
 
 func TransactionTest() {
-	db := getGormDb()
+	db := getGormSqlliteDb()
 	db.AutoMigrate(&Account{})
 	db.AutoMigrate(&Transaction{})
 	account1 := Account{
@@ -58,6 +58,7 @@ func Transfer(from uint64, to uint64, amount int64, db *gorm.DB) bool {
 			Amount:        amount,
 		}
 		tx.Create(&tran)
+		fmt.Println("finish transfer ", fromAccount, "->", toAccount, ",amount ", amount)
 		return nil
 	})
 	if err != nil {

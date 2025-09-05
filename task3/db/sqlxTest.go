@@ -17,7 +17,7 @@ type Book struct {
 }
 
 func migrateData() {
-	db := getGormDb()
+	db := getGormSqlliteDb()
 	db.AutoMigrate(&Employee{})
 	db.AutoMigrate(&Book{})
 	rows, err := db.Model(&Employee{}).Where("1=1 limit 1").Rows()
@@ -45,7 +45,7 @@ func prepareData() {
 }
 func SqlxTest() {
 	prepareData()
-	sqlxdb := getSqlxDb()
+	sqlxdb := getSqlxSqlliteDb()
 	var employees []Employee
 	sqlxdb.Select(&employees, "select * from employees where department= ?", "IT")
 	var emp Employee

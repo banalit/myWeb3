@@ -15,7 +15,7 @@ type Student struct {
 }
 
 func CrudTest() {
-	db := getGormDb()
+	db := getGormSqlliteDb()
 	student := &Student{
 		Name:  "zhangsan",
 		Age:   20,
@@ -44,6 +44,6 @@ func CrudTest() {
 	}
 
 	db.Model(&Student{}).Where("name=?", "zhangsan").Update("grade", "grade 4")
-	db.Debug().Where("age < ?", 100).Delete(&Student{})
+	// db.Debug().Where("age < ?", 100).Delete(&Student{})
 
 }
