@@ -10,10 +10,10 @@ import (
 	"gorm.io/gorm"
 )
 
-const MYSQL_IP = "47.106.246.115"
-const MYSQL_USER = "metanode"
-const MYSQL_PWD = "metanodeLuke2025"
-const MYSQL_DB = "metanode"
+const MYSQL_IP = ""
+const MYSQL_USER = ""
+const MYSQL_PWD = ""
+const MYSQL_DB = ""
 
 func getSqlxDb() *sqlx.DB {
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:13306)/%s?parseTime=true&loc=Local", MYSQL_USER, MYSQL_PWD, MYSQL_IP, MYSQL_DB)
