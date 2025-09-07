@@ -2,7 +2,12 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	task4Rest "github.com/luke/web3Learn/task4/rest"
 )
+
+func init() {
+
+}
 
 func main() {
 	router := gin.New()
@@ -15,5 +20,8 @@ func main() {
 			"message": "pong",
 		})
 	})
+
+	task4Rest.router = router
+	task4Rest.AddRestApi(router)
 	router.Run()
 }

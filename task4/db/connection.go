@@ -1,7 +1,7 @@
-package task3
+package task4
 
 import (
-	"log"
+	"fmt"
 
 	"github.com/jmoiron/sqlx"
 	"gorm.io/driver/sqlite"
@@ -17,7 +17,7 @@ func getSqlxSqlliteDb() *sqlx.DB {
 func getGormSqlliteDb() *gorm.DB {
 	db, err := gorm.Open(sqlite.Open("blogs.db"), &gorm.Config{})
 	if err != nil {
-		log.Fatalf("open sqlite error:", err)
+		panic(fmt.Sprintf("open sqlite error:%s", err))
 	}
 	return db
 }
