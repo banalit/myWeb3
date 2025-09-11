@@ -2,12 +2,12 @@ package task4
 
 import (
 	"log"
-	"net/http"
+
+	task4Db "task4/db"
+	task4Middle "task4/middleware"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
-	task4Db "github.com/luke/web3Learn/task4/db"
-	task4Middle "github.com/luke/web3Learn/task4/middleware"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -17,87 +17,56 @@ func init() {
 
 }
 
-func AddRestApi(r *gin.Engine) {
-	apiPublic := r.Group("/api")
-	{
-		apiPublic.POST("/register", register)
-		apiPublic.POST("/login", login)
-	}
-	apiJwt := r.Group("/api")
-	apiJwt.Use(task4Middle.JwtAuthMiddleware)
-	{
-		apiJwt.POST("/logout", logout)
-
-		apiJwt.POST("/post", createPost)
-		apiJwt.DELETE("/post", deletePost)
-		apiJwt.PATCH("/post", patchPost)
-		apiJwt.GET("/post", listPost)
-		apiJwt.POST("/comment", createComment)
-		apiJwt.DELETE("/comment", deleteComment)
-		apiJwt.PATCH("/comment", patchComment)
-		apiJwt.GET("/comment", listComment)
-	}
-
-}
-
-func register(c *gin.Context) {
+func Register(c *gin.Context) {
 	var user task4Db.User
+	// body, _ := io.ReadAll(c.Request.Body)
+	// log.Printf("原始表单数据: %s", body)
+	// 重新将数据写回请求体，避免后续绑定失败
 	if err := c.ShouldBindWith(&user, binding.Form); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
+		ErrorResponse(c, 500, nil, err.Error())
 		return
 	}
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ErrorResponse(c, 500, nil, err.Error())
 		return
 	}
 	user.Password = string(hashedPassword)
 	if err := task4Db.CreateUser(&user); err != nil {
-		log.Fatal(err)
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to create user",
-		})
+		log.Println("发生错误：", err)
+		ErrorResponse(c, 500, nil, "Failed to create user")
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{
-		"message": "user created successfully",
-	})
+	SuccessResponse(c, user, "user created successfully")
 }
 
-func login(c *gin.Context) {
+func Login(c *gin.Context) {
 	var userInput task4Db.User
-	if err := c.ShouldBindJSON(&userInput); err != nil {
-		c.JSON(400, gin.H{
-			"error": err.Error(),
-		})
+	if err := c.ShouldBindWith(&userInput, binding.Form); err != nil {
+		ErrorResponse(c, 400, nil, err.Error())
 		return
 	}
 	if userDb, err := task4Db.GetUser(userInput.UserName); err != nil {
-		c.JSON(200, gin.H{"error": "user login failed"})
+		ErrorResponse(c, 400, nil, "user login failed")
 		return
 	} else {
 		if !validatePwd(userDb.Password, userInput.Password) {
-			c.JSON(200, gin.H{"error": "user login failed"})
+			ErrorResponse(c, 400, nil, "user login failed")
 			return
 		}
 		userInput = userDb
 	}
-	if token, err := task4Middle.generateJwtToken(userInput.UserID, userInput.UserName); err != nil {
-		c.JSON(500, gin.H{"error": "生成令牌失败"})
+	if token, err := task4Middle.GenerateJwtToken(userInput.ID, userInput.UserName); err != nil {
+		ErrorResponse(c, 400, nil, "生成令牌失败")
 		return
 	} else {
-		c.JSON(200, gin.H{
-			"message": "登录成功",
-			"token":   token,
-			"user": gin.H{
-				"id":       userInput.UserID,
-				"username": userInput.Username,
-				"email":    userInput.Email,
-			},
-		})
+		SuccessResponse(c, gin.H{
+			"id":       userInput.ID,
+			"username": userInput.UserName,
+			"email":    userInput.Email,
+			"token":    token,
+		}, "登录成功")
 	}
 
 }
@@ -110,19 +79,18 @@ func validatePwd(dbPwd string, inputPwd string) bool {
 }
 
 // 退出登录处理函数
-func logout(c *gin.Context) {
+func Logout(c *gin.Context) {
 	// 从上下文获取当前token
-	tokenString, exists := c.Get("tokenString")
-	if !exists {
-		c.JSON(400, gin.H{"error": "无法获取token"})
+	authHeader := c.GetHeader("Authorization")
+	if authHeader == "" || len(authHeader) < 8 {
+		c.JSON(401, gin.H{"error": "无法获取token"})
+		c.Abort()
 		return
 	}
-	if err := task4Middle.addBlacklistToken(tokenString); err != nil {
-		c.JSON(200, gin.H{
-			"error": "fail to delete token",
-		})
+	tokenString := authHeader[7:]
+	if err := task4Middle.AddBlacklistToken(tokenString); err != nil {
+		ErrorResponse(c, 400, nil, "fail to delete token")
 		return
 	}
-
-	c.JSON(200, gin.H{"message": "退出登录成功"})
+	SuccessResponse(c, nil, "退出登录成功")
 }

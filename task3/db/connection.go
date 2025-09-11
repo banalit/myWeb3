@@ -40,7 +40,7 @@ func getSqlxSqlliteDb() *sqlx.DB {
 func getGormSqlliteDb() *gorm.DB {
 	db, err := gorm.Open(sqlite.Open("metanode.db"), &gorm.Config{})
 	if err != nil {
-		log.Fatalf("open sqlite error:", err)
+		log.Println("open sqlite error:", err)
 	}
 	return db
 }
