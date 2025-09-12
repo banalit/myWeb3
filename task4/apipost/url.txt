@@ -1,0 +1,4 @@
+https://docs.apipost.net/docs/detail/50327edf3891000?locale=zh-cn&target_id=321ee6ef5305c
+
+https://openapi.apipost.net/swagger/v3/50327edf3891000?locale=zh-cn
+
